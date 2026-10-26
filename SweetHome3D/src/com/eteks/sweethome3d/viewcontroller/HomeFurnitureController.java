@@ -53,7 +53,7 @@ public class HomeFurnitureController implements Controller {
    * The properties that may be edited by the view associated to this controller. 
    */
   public enum Property {ICON, NAME, NAME_VISIBLE, DESCRIPTION, PRICE, X, Y, ELEVATION, ANGLE_IN_DEGREES, BASE_PLAN_ITEM, 
-      WIDTH, DEPTH,  HEIGHT, PROPORTIONAL, COLOR, PAINT, SHININESS, VISIBLE, MODEL_MIRRORED, LIGHT_POWER, 
+      WIDTH, DEPTH,  HEIGHT, VOLUME, PROPORTIONAL, COLOR, PAINT, SHININESS, VISIBLE, MODEL_MIRRORED, LIGHT_POWER,
       RESIZABLE, DEFORMABLE, TEXTURABLE}
   
   /**
@@ -92,6 +92,8 @@ public class HomeFurnitureController implements Controller {
   private Float              proportionalDepth;
   private Float              height;
   private Float              proportionalHeight;
+  private Float              volume;
+  private Float              proportionalVolume;
   private boolean            proportional;
   private Integer            color;
   private FurniturePaint     paint;
@@ -396,6 +398,15 @@ public class HomeFurnitureController implements Controller {
         }
       }
       setHeight(height, true, false);
+
+      Float volume = firstPiece.getVolume();
+      for (int i = 1; i < selectedFurniture.size(); i++) {
+        if (volume.floatValue() != selectedFurniture.get(i).getVolume()) {
+          volume = null;
+          break;
+        }
+      }
+      setVolume(volume);
 
       List<HomePieceOfFurniture> selectedFurnitureWithoutGroups = getFurnitureWithoutGroups(selectedFurniture);
       HomePieceOfFurniture firstPieceExceptGroup = selectedFurnitureWithoutGroups.get(0);
@@ -954,6 +965,26 @@ public class HomeFurnitureController implements Controller {
    */
   public Float getHeight() {
     return this.height;
+  }
+
+  /**
+   * Sets the edited volume.
+   */
+  public void setVolume(Float volume) {
+    Float adjustedVolume = volume != null
+            ? Math.max(volume, 0.001f)
+            : null;
+
+    Float oldVolume = this.volume;
+    this.volume = adjustedVolume;
+    this.propertyChangeSupport.firePropertyChange(Property.VOLUME.name(), oldVolume, adjustedVolume);
+  }
+
+  /**
+   * Returns the edited volume.
+   */
+  public Float getVolume() {
+    return this.volume;
   }
   
   /**
