@@ -540,6 +540,8 @@ public class HomePieceOfFurniture extends HomeObject implements PieceOfFurniture
         this.depth = depth;
         this.shapeCache = null;
         this.propertyChangeSupport.firePropertyChange(Property.DEPTH.name(), oldDepth, depth);
+
+        setVolume(this.width * this.height * this.depth);
       }
     } else {
       throw new IllegalStateException("Piece isn't resizable");
@@ -564,6 +566,8 @@ public class HomePieceOfFurniture extends HomeObject implements PieceOfFurniture
         float oldHeight = this.height;
         this.height = height;
         this.propertyChangeSupport.firePropertyChange(Property.HEIGHT.name(), oldHeight, height);
+
+        setVolume(this.width * this.height * this.depth);
       }
     } else {
       throw new IllegalStateException("Piece isn't resizable");
@@ -589,6 +593,8 @@ public class HomePieceOfFurniture extends HomeObject implements PieceOfFurniture
         this.width = width;
         this.shapeCache = null;
         this.propertyChangeSupport.firePropertyChange(Property.WIDTH.name(), oldWidth, width);
+
+        setVolume(this.width * this.height * this.depth);
       }
     } else {
       throw new IllegalStateException("Piece isn't resizable");
