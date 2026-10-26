@@ -750,8 +750,13 @@ public class FurnitureTable extends JTable implements View, Printable {
           return headerRendererLabel;
         }
       };
-    for (int columnIndex = 0, n = columnModel.getColumnCount(); columnIndex < n; columnIndex++) {
-      final TableColumn tableColumn = columnModel.getColumn(columnIndex);
+    // Print visible columns, with a Level column added if home has levels
+    List<TableColumn> printedColumns = new ArrayList<TableColumn>();
+    for (Enumeration<TableColumn> it = columnModel.getColumns(); it.hasMoreElements(); ) {
+      printedColumns.add(it.nextElement());
+    }
+    addLevelColumnIfMissing(printedColumns);
+    for (final TableColumn tableColumn : printedColumns) {
       // Create a printable column from existing table column
       TableColumn printableColumn = new TableColumn();
       printableColumn.setIdentifier(tableColumn.getIdentifier());
@@ -780,6 +785,34 @@ public class FurnitureTable extends JTable implements View, Printable {
       printableColumnModel.addColumn(printableColumn);
     }    
     return print(g, pageFormat, pageIndex, printableColumnModel, Color.BLACK);
+  }
+
+  /**
+   * Adds the Level column after the Name column (or first if Name isn't printed)
+   * to <code>printedColumns</code> if home contains levels and this column is missing.
+   * The column displayed on screen and home visible properties aren't modified.
+   */
+  private void addLevelColumnIfMissing(List<TableColumn> printedColumns) {
+    if (!(getModel() instanceof FurnitureTreeTableModel)
+        || !(getColumnModel() instanceof FurnitureTableColumnModel)
+        || ((FurnitureTreeTableModel)getModel()).home.getLevels().isEmpty()) {
+      return;
+    }
+    int nameColumnIndex = -1;
+    for (int i = 0; i < printedColumns.size(); i++) {
+      Object identifier = printedColumns.get(i).getIdentifier();
+      if (identifier == HomePieceOfFurniture.SortableProperty.LEVEL) {
+        // Level column already visible
+        return;
+      } else if (identifier == HomePieceOfFurniture.SortableProperty.NAME) {
+        nameColumnIndex = i;
+      }
+    }
+    TableColumn levelColumn = ((FurnitureTableColumnModel)getColumnModel()).availableColumns.get(
+        HomePieceOfFurniture.SortableProperty.LEVEL);
+    if (levelColumn != null) {
+      printedColumns.add(nameColumnIndex + 1, levelColumn);
+    }
   }
 
   /**
